@@ -1,7 +1,12 @@
 {
-  "metal": 2.5,
-  "plastic": 3.2,
-  "glass": 1.8,
-  "cardboard": 1.2
+    "project": "EcoLoop",
+    "version": "2.0",
+    "factors": {
+        "METAL": 2.5,
+        "PLASTIC": 1.5,
+        "WOOD": 2.0,
+        "CARDBOARD": 0.9,
+        "GLASS": 0.5,
+        "BIODEGRADABLE": 1.0
+    }
 }
-
