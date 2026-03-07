@@ -117,7 +117,9 @@ class CarbonCalculator:
         total_weight = 0.0
         total_carbon = 0.0
 
-        for item_name in detected_materials:
+        for item in detected_materials:
+            item_name = item["name"]
+            
             # Normalize material name to uppercase
             material = self.normalize_material_name(item_name)
             

@@ -35,12 +35,21 @@ class ModelLoader:
 
             logger.info(f"Loading YOLOv8 model from {self.model_path}")
             self.model = YOLO(self.model_path)
+
+            # Select device (GPU if available)
+            try:
+                import torch
+                device = "cuda" if torch.cuda.is_available() else "cpu"
+                self.model.to(device)
+                logger.info(f"Model running on {device}")
+            except Exception:
+                logger.warning("Torch device detection failed, using default device")
             logger.info("YOLOv8 model loaded successfully")
         except Exception as e:
             logger.error(f"Failed to load YOLOv8 model: {e}")
             raise
 
-    def predict(self, image_path: str) -> list:
+    def predict(self, image_input) -> list:
         """
         Run inference on an image.
 
@@ -55,7 +64,7 @@ class ModelLoader:
 
         try:
             logger.debug(f"Running inference on {image_path}")
-            results = self.model(image_path, verbose=False)
+            results = self.model(image_input, verbose=False)
             
             detected_items = []
             for result in results:
@@ -64,8 +73,15 @@ class ModelLoader:
                     for box in result.boxes:
                         class_id = int(box.cls[0])
                         class_name = result.names[class_id]
-                        detected_items.append(class_name)
-            
+                        confidence = float(box.conf[0])
+
+                        # Filter low confidence detections
+                        if confidence > 0.5:
+                            detected_items.append({
+                                "name": class_name,
+                                "confidence": round(confidence, 3)
+                            })
+            detected_items = detected_items[:5]
             logger.info(f"Detected {len(detected_items)} objects: {detected_items}")
             return detected_items
         except Exception as e:
