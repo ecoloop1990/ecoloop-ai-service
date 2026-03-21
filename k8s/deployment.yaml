@@ -1,44 +1,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ecoloop-ai
+  name: ecoloop-ai-service
+  namespace: default
   labels:
-    app: ecoloop-ai
-    version: "2.0"
+    app: ecoloop-ai-service
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: ecoloop-ai
+      app: ecoloop-ai-service
   template:
     metadata:
       labels:
-        app: ecoloop-ai
-        version: "2.0"
+        app: ecoloop-ai-service
     spec:
+      serviceAccountName: ecoloop-ai-service
       containers:
       - name: ecoloop-ai-service
-        image: ecoloop-ai-service:latest
-        imagePullPolicy: IfNotPresent
+        image: <account_id>.dkr.ecr.<region>.amazonaws.com/ecoloop-ai-service:latest
+        imagePullPolicy: Always
+        command: ["uvicorn"]
+        args: ["app.main:app", "--host", "0.0.0.0", "--port", "8000"]
         ports:
         - containerPort: 8000
           name: http
           protocol: TCP
-        env:
-        - name: ENVIRONMENT
-          valueFrom:
-            configMapKeyRef:
-              name: ecoloop-ai-config
-              key: ENVIRONMENT
-        - name: LOG_LEVEL
-          valueFrom:
-            configMapKeyRef:
-              name: ecoloop-ai-config
-              key: LOG_LEVEL
+        envFrom:
+        - configMapRef:
+            name: ecoloop-ai-service-config
         resources:
-          requests:
-            cpu: 250m
-            memory: 256Mi
           limits:
             cpu: 500m
             memory: 512Mi
@@ -46,7 +37,7 @@ spec:
           httpGet:
             path: /health
             port: 8000
-          initialDelaySeconds: 30
+          initialDelaySeconds: 20
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3
@@ -58,4 +49,3 @@ spec:
           periodSeconds: 5
           timeoutSeconds: 3
           failureThreshold: 3
-

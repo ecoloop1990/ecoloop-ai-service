@@ -1,14 +1,15 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: ecoloop-ai-hpa
+  name: ecoloop-ai-service-hpa
+  namespace: default
   labels:
-    app: ecoloop-ai
+    app: ecoloop-ai-service
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: ecoloop-ai
+    name: ecoloop-ai-service
   minReplicas: 2
   maxReplicas: 5
   metrics:
