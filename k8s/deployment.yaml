@@ -18,26 +18,23 @@ spec:
       serviceAccountName: ecoloop-ai-service
       containers:
       - name: ecoloop-ai-service
-        image: <account_id>.dkr.ecr.<region>.amazonaws.com/ecoloop-ai-service:latest
+        image: 632150488624.dkr.ecr.us-east-1.amazonaws.com/ecoloop-ai-service:latest
         imagePullPolicy: Always
-        command: ["uvicorn"]
-        args: ["app.main:app", "--host", "0.0.0.0", "--port", "8000"]
         ports:
         - containerPort: 8000
           name: http
-          protocol: TCP
-        envFrom:
-        - configMapRef:
-            name: ecoloop-ai-service-config
         resources:
           limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
             cpu: 500m
             memory: 512Mi
         livenessProbe:
           httpGet:
             path: /health
             port: 8000
-          initialDelaySeconds: 20
+          initialDelaySeconds: 60
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3
@@ -45,7 +42,7 @@ spec:
           httpGet:
             path: /health
             port: 8000
-          initialDelaySeconds: 10
+          initialDelaySeconds: 30
           periodSeconds: 5
           timeoutSeconds: 3
           failureThreshold: 3
