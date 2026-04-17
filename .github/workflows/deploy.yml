@@ -94,10 +94,38 @@ jobs:
           # Replace the image tag in deployment.yaml
           sed -i "s|image:.*|image: ${{ vars.ECR_REGISTRY }}/${{ vars.ECR_REPOSITORY }}:${{ github.sha }}|g" k8s/deployment.yaml
 
+
       - name: Deploy to Kubernetes
         run: |
           kubectl apply -f k8s/
-          kubectl rollout status deployment/ecoloop-ai-service -n default --timeout=5m
+          
+          # Wait a moment for pods to be created
+          sleep 10
+          
+          # Check pod status
+          echo "=== Pod Status ==="
+          kubectl get pods -l app=ecoloop-ai-service
+          
+          # Describe the pods to see issues
+          echo "=== Pod Details ==="
+          kubectl describe pods -l app=ecoloop-ai-service
+          
+          # Check logs if any pod exists
+          echo "=== Pod Logs ==="
+          POD_NAME=$(kubectl get pods -l app=ecoloop-ai-service -o name 2>/dev/null | head -1)
+          if [ -n "$POD_NAME" ]; then
+            kubectl logs $POD_NAME --tail=100
+          fi
+          
+          # Check events
+          echo "=== Events ==="
+          kubectl get events --sort-by='.lastTimestamp' | tail -20
+          
+          # Then try rollout status
+          kubectl rollout status deployment/ecoloop-ai-service -n default --timeout=5m || {
+            echo "Rollout failed"
+            exit 1
+          }
 
       - name: Verify deployment
         run: |
