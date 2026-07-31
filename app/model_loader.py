@@ -63,7 +63,7 @@ class ModelLoader:
             raise RuntimeError("Model not loaded")
 
         try:
-            logger.debug(f"Running inference on {image_path}")
+            logger.debug(f"Running inference on {image_input}")
             results = self.model(image_input, verbose=False)
             
             detected_items = []
