@@ -205,10 +205,13 @@ async def analyze_image(file: UploadFile = File(...)):
                 content={"error": "Inference timeout. Request took too long."},
             )
         except Exception as e:
-            logger.error(f"Inference error: {e}", exc_info=True)
+            import traceback
+
+            logger.error(traceback.format_exc())
+
             return JSONResponse(
                 status_code=500,
-                content={"error": "Inference failed. Please try again."},
+                content={"error": str(e)},
             )
 
         # Calculate carbon footprint
