@@ -47,7 +47,7 @@ carbon_calculator: CarbonCalculator = None
 # Configuration
 MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10MB
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".webp"}
-INFERENCE_TIMEOUT = 3.0  # seconds
+INFERENCE_TIMEOUT = 15.0  # seconds
 
 
 @app.on_event("startup")
